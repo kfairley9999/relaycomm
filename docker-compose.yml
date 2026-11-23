@@ -1,0 +1,26 @@
+services:
+  relaycomm:
+    build: .
+    container_name: relaycomm
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env.example
+    environment:
+      RELAYCOMM_DB_PATH: /data/relaycomm.db
+      RELAYCOMM_ADAPTER: simulator
+    volumes:
+      - relaycomm_data:/data
+    restart: unless-stopped
+
+  # Optional local SMTP sink for testing RELAYCOMM_ADAPTER=smtp_gateway:
+  #   docker compose --profile smtp up
+  mailpit:
+    image: axllent/mailpit:latest
+    profiles: ["smtp"]
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  relaycomm_data:

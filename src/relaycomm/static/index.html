@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relaycomm Console — Programmable SMS &amp; Voice</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #131a2e;
+      --panel-alt: #19223b;
+      --border: #273252;
+      --text: #e6ebf5;
+      --muted: #92a0c0;
+      --accent: #4f8cff;
+      --accent-soft: rgba(79, 140, 255, 0.14);
+      --green: #2ecc71;
+      --amber: #f5b041;
+      --red: #ff5c5c;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      background: #0e1528;
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #4f8cff, #7b5cff);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .brand small {
+      color: var(--muted);
+      font-size: 12px;
+      display: block;
+    }
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .pill {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .pill strong { color: var(--text); }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { opacity: 0.92; }
+    button.secondary {
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    main {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .mono { font-family: var(--mono); font-size: 12px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge.ok { background: rgba(46, 204, 113, 0.16); color: var(--green); }
+    .badge.warn { background: rgba(245, 176, 65, 0.16); color: var(--amber); }
+    .badge.err { background: rgba(255, 92, 92, 0.16); color: var(--red); }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 16px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 10px 0 4px;
+    }
+    input, textarea, select {
+      width: 100%;
+      background: #0d1426;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 8px 10px;
+      font-family: var(--sans);
+      font-size: 13px;
+    }
+    textarea { font-family: var(--mono); min-height: 92px; }
+    pre {
+      background: #0a0f1d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      overflow-x: auto;
+      margin: 6px 0 0;
+      color: #c8d6f0;
+    }
+    .notice {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .empty {
+      color: var(--muted);
+      padding: 20px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">R</div>
+      <div>
+        <h1>Relaycomm Console</h1>
+        <small>Self-hosted, Twilio-compatible SMS &amp; Voice API</small>
+      </div>
+    </div>
+    <div class="meta-bar">
+      <span class="pill">Account: <strong id="acctSid">...</strong></span>
+      <span class="pill">Adapter: <strong id="activeAdapter">...</strong></span>
+      <button class="secondary" onclick="loadState()">Refresh</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats">
+      <div class="card">
+        <div class="stat-label">Messages</div>
+        <div class="stat-value" id="statMessages">0</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Calls</div>
+        <div class="stat-value" id="statCalls">0</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Recordings</div>
+        <div class="stat-value" id="statRecordings">0</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">Signed Webhooks</div>
+        <div class="stat-value" id="statWebhooks">0</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('messages', this)">Messages</button>
+      <button class="tab" onclick="switchTab('calls', this)">Calls &amp; TwiML</button>
+      <button class="tab" onclick="switchTab('webhooks', this)">Webhooks</button>
+      <button class="tab" onclick="switchTab('simulator', this)">Simulator &amp; Adapters</button>
+    </div>
+
+    <section id="tab-messages" class="tab-panel active card">
+      <table>
+        <thead>
+          <tr>
+            <th>SID</th>
+            <th>Direction</th>
+            <th>From &rarr; To</th>
+            <th>Body</th>
+            <th>Adapter</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody id="messagesBody"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-calls" class="tab-panel card">
+      <table>
+        <thead>
+          <tr>
+            <th>SID</th>
+            <th>Direction</th>
+            <th>From &rarr; To</th>
+            <th>Duration</th>
+            <th>Adapter</th>
+            <th>Status</th>
+            <th>TwiML Execution Trace</th>
+          </tr>
+        </thead>
+        <tbody id="callsBody"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-webhooks" class="tab-panel card">
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th>Resource</th>
+            <th>Target</th>
+            <th>HTTP</th>
+            <th>X-Twilio-Signature</th>
+            <th>Payload</th>
+          </tr>
+        </thead>
+        <tbody id="webhooksBody"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-simulator" class="tab-panel">
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-top:0">Simulate Outbound SMS</h3>
+          <label>From</label>
+          <input id="smsFrom" value="+15550100001" />
+          <label>To (test number only)</label>
+          <input id="smsTo" value="+15550109999" />
+          <label>Body</label>
+          <textarea id="smsBody">Hello from Relaycomm!</textarea>
+          <label>Optional StatusCallback URL</label>
+          <input id="smsCb" placeholder="http://localhost:9000/status" />
+          <div style="margin-top:12px">
+            <button onclick="sendSimSms()">Send Simulated SMS</button>
+          </div>
+          <pre id="smsResult" style="display:none"></pre>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0">Simulate TwiML Voice Call</h3>
+          <label>From</label>
+          <input id="callFrom" value="+15550100001" />
+          <label>To (test number only)</label>
+          <input id="callTo" value="+15550109999" />
+          <label>Simulated DTMF Digits (for &lt;Gather&gt;)</label>
+          <input id="callDigits" value="1" />
+          <label>Inline TwiML</label>
+          <textarea id="callTwiml">&lt;Response&gt;
+  &lt;Say voice="alice"&gt;Welcome to Relaycomm.&lt;/Say&gt;
+  &lt;Gather numDigits="1"&gt;
+    &lt;Say&gt;Press 1 to confirm.&lt;/Say&gt;
+  &lt;/Gather&gt;
+  &lt;Record maxLength="15" /&gt;
+  &lt;Hangup /&gt;
+&lt;/Response&gt;</textarea>
+          <div style="margin-top:12px">
+            <button onclick="sendSimCall()">Run Simulated Call</button>
+          </div>
+          <pre id="callResult" style="display:none"></pre>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <h3 style="margin-top:0">Registered Carrier Adapters</h3>
+        <div id="adaptersList"></div>
+        <p class="notice">
+          Note: Only the <code>simulator</code> runs offline by default. Real PSTN delivery requires
+          configuring a live SIP trunk (Asterisk/FreeSWITCH) or paid Telnyx/Vonage carrier credentials.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function esc(str) {
+      return String(str ?? "").replace(/[&<>"']/g, s => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[s]));
+    }
+
+    function statusBadge(st) {
+      const s = (st || "").toLowerCase();
+      if (["delivered", "sent", "completed", "received"].includes(s)) {
+        return `<span class="badge ok">${esc(st)}</span>`;
+      }
+      if (["queued", "ringing", "in-progress"].includes(s)) {
+        return `<span class="badge warn">${esc(st)}</span>`;
+      }
+      return `<span class="badge err">${esc(st)}</span>`;
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + name).classList.add("active");
+    }
+
+    async function loadState() {
+      const res = await fetch("/console/api/state");
+      const data = await res.json();
+
+      document.getElementById("acctSid").textContent = data.account_sid;
+      document.getElementById("activeAdapter").textContent = data.active_adapter;
+      document.getElementById("statMessages").textContent = data.stats.messages;
+      document.getElementById("statCalls").textContent = data.stats.calls;
+      document.getElementById("statRecordings").textContent = data.stats.recordings;
+      document.getElementById("statWebhooks").textContent = data.stats.webhooks;
+
+      const msgBody = document.getElementById("messagesBody");
+      msgBody.innerHTML = data.messages.length ? data.messages.map(m => `
+        <tr>
+          <td class="mono">${esc(m.sid)}</td>
+          <td>${esc(m.direction)}</td>
+          <td class="mono">${esc(m.from)} &rarr; ${esc(m.to)}</td>
+          <td>${esc(m.body)}</td>
+          <td class="mono">${esc(m.adapter)}</td>
+          <td>${statusBadge(m.status)}</td>
+          <td class="mono">${esc(m.date_created)}</td>
+        </tr>
+      `).join("") : `<tr><td colspan="7" class="empty">No messages yet.</td></tr>`;
+
+      const callsBody = document.getElementById("callsBody");
+      callsBody.innerHTML = data.calls.length ? data.calls.map(c => `
+        <tr>
+          <td class="mono">${esc(c.sid)}</td>
+          <td>${esc(c.direction)}</td>
+          <td class="mono">${esc(c.from)} &rarr; ${esc(c.to)}</td>
+          <td>${esc(c.duration || "0")}s</td>
+          <td class="mono">${esc(c.adapter)}</td>
+          <td>${statusBadge(c.status)}</td>
+          <td><pre>${esc(JSON.stringify(c.twiml_log, null, 2))}</pre></td>
+        </tr>
+      `).join("") : `<tr><td colspan="7" class="empty">No calls yet.</td></tr>`;
+
+      const whBody = document.getElementById("webhooksBody");
+      whBody.innerHTML = data.webhooks.length ? data.webhooks.map(w => `
+        <tr>
+          <td class="mono">${esc(w.event)}</td>
+          <td class="mono">${esc(w.resource_sid)}</td>
+          <td class="mono">${esc(w.method)} ${esc(w.target_url)}</td>
+          <td>${w.status_code ? statusBadge(String(w.status_code)) : `<span class="badge err">${esc(w.error || "ERR")}</span>`}</td>
+          <td class="mono">${esc(w.signature)}</td>
+          <td><pre>${esc(JSON.stringify(w.request_body, null, 2))}</pre></td>
+        </tr>
+      `).join("") : `<tr><td colspan="6" class="empty">No webhook deliveries logged yet.</td></tr>`;
+
+      const adaptersDiv = document.getElementById("adaptersList");
+      adaptersDiv.innerHTML = data.adapters.map(a => `
+        <div style="padding:8px 0; border-bottom:1px solid var(--border)">
+          <strong class="mono">${esc(a.name)}</strong>
+          ${a.is_live_pstn ? '<span class="badge warn">External PSTN</span>' : '<span class="badge ok">Local / Stub</span>'}
+          <div style="color:var(--muted); font-size:13px">${esc(a.description)}</div>
+        </div>
+      `).join("");
+    }
+
+    async function sendSimSms() {
+      const res = await fetch("/console/api/simulate/outbound-sms", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          from: document.getElementById("smsFrom").value,
+          to: document.getElementById("smsTo").value,
+          body: document.getElementById("smsBody").value,
+          status_callback: document.getElementById("smsCb").value || null
+        })
+      });
+      const data = await res.json();
+      const el = document.getElementById("smsResult");
+      el.style.display = "block";
+      el.textContent = JSON.stringify(data, null, 2);
+      loadState();
+    }
+
+    async function sendSimCall() {
+      const res = await fetch("/console/api/simulate/outbound-call", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          from: document.getElementById("callFrom").value,
+          to: document.getElementById("callTo").value,
+          twiml: document.getElementById("callTwiml").value,
+          simulated_digits: document.getElementById("callDigits").value || null
+        })
+      });
+      const data = await res.json();
+      const el = document.getElementById("callResult");
+      el.style.display = "block";
+      el.textContent = JSON.stringify(data, null, 2);
+      loadState();
+    }
+
+    loadState();
+  </script>
+</body>
+</html>
