@@ -1,6 +1,6 @@
 # Relaycomm
 
-[![Tests](https://github.com/kfairy9999/relaycomm/actions/workflows/tests.yml/badge.svg)](https://github.com/kfairy9999/relaycomm/actions/workflows/tests.yml)
+[![Tests](https://github.com/kfairley9999/relaycomm/actions/workflows/tests.yml/badge.svg)](https://github.com/kfairley9999/relaycomm/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **Relaycomm** is a self-hosted, open-source programmable SMS and Voice API that mirrors Twilio's REST shape. It is a control plane you can run locally or on your own server: develop Twilio-compatible messaging and TwiML voice workflows against an offline simulator, then plug in a carrier or SIP trunk later if you need real public-telephone delivery.
@@ -49,7 +49,7 @@ flowchart LR
 Requires Python 3.11+.
 
 ```bash
-git clone https://github.com/kfairy9999/relaycomm.git
+git clone https://github.com/kfairley9999/relaycomm.git
 cd relaycomm
 python -m venv .venv
 source .venv/bin/activate
